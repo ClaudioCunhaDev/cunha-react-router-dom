@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "intel 8700k",
+    "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    "price": "250"
+  },
+  {
+    "id": 2,
+    "name": "intel 8800k",
+    "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    "price": "350"
+  },
+  {
+    "id": 3,
+    "name": "ryzen 5x",
+    "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    "price": "320"
+  }
+]
