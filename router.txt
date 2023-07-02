@@ -1,0 +1,174 @@
+npm i react-router-dom
+
+src-> Create file: router.jsx
+
+router.jsx:
+
+
+import {createBrowserRouter} from "react-router-dom"
+
+const router = createBrowserRouter([
+	{
+		path: "/",
+		element: <Home/>
+	},
+	{
+		path: "/products",
+		element: <Products/>
+	},
+	{
+		path: "/cart",
+		element: <Cart/>
+	},
+	{
+		path: "/admin",
+		element: <Admin/>
+	}
+])
+
+
+App.jsx:
+
+import {RouterProvider} from "react-router-dom"
+import router from "./router";
+
+function App(){
+	return <RouterProvider router={router} />
+}
+
+export default App
+
+
+Navbar.jsx:
+
+import React from "react";
+import { Link } from "react-router-dom";
+
+export const Navbar = () => {
+  return (
+    <header>
+      <nav style={{ display: "flex", gap: "2rem" }}>
+        <Link to="/">Home</Link>
+        <Link to="/products">Products</Link>
+        <Link to="/cart">Cart</Link>
+      </nav>
+    </header>
+  );
+};
+
+Home.jsx:
+
+import React from "react";
+import { Navbar } from "../Components/Navbar";
+
+export const Home = () => {
+  return (
+    <div>
+      <Navbar />
+      <h1>Home</h1>
+    </div>
+  );
+};
+
+Products.jsx:
+
+import React from "react";
+import { Navbar } from "../Components/Navbar";
+
+export const Products = () => {
+  return (
+    <div>
+      <Navbar />
+      <h1>Products</h1>
+    </div>
+  );
+};
+
+Cart.jsx:
+
+import React from "react";
+import { Navbar } from "../Components/Navbar";
+
+export const Cart = () => {
+  return (
+    <div>
+      <Navbar />
+      <h1>Cart</h1>
+    </div>
+  );
+};
+
+Admin:
+
+import React from "react";
+import { Navbar } from "../Components/Navbar";
+
+export const Admin = () => {
+  return (
+    <div>
+      <Navbar />
+      <h1>Admin</h1>
+    </div>
+  );
+};
+
+
+-------------------------------------------------------
+Best way to do this: with children
+
+1º: Remove <NavBar/> from all componentes
+
+2º: Pages -> create RootLayout.jsx:
+
+import React from "react";
+import { Navbar } from "../Components/Navbar";
+import { Outlet } from "react-router-dom";
+
+export const RootLayout = () => {
+  return (
+    <>
+      <Navbar />
+      <hr />
+      <main>
+        <Outlet />
+      </main>
+    </>
+  );
+};
+
+3º: router.jsx:
+
+import { createBrowserRouter } from "react-router-dom";
+import { Home } from "./Pages/Home";
+import { Products } from "./Pages/Products";
+import { Cart } from "./Pages/Cart";
+import { Admin } from "./Pages/Admin";
+import { RootLayout } from "./Pages/RootLayout";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <RootLayout />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: "products",
+        element: <Products />,
+      },
+      {
+        path: "cart",
+        element: <Cart />,
+      },
+    ],
+  },
+  {
+    path: "/admin",
+    element: <Admin />,
+  },
+]);
+
+export default router;
+
