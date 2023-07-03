@@ -5,6 +5,7 @@ import { Cart } from "./Pages/Cart";
 import { Admin } from "./Pages/Admin";
 import { RootLayout } from "./Pages/RootLayout";
 import { Product } from "./Pages/Product";
+import loadProduct from "./loaders/products";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
       {
         path: `products/:productId`,
         element: <Product />,
+        loader: loadProduct
       },
       {
         path: "cart",

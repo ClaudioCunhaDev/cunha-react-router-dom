@@ -1,17 +1,19 @@
 import React from "react";
-import { Link, useParams } from "react-router-dom";
-import productsDatabase from "../database.json";
-
+import { Link, useLoaderData, useParams } from "react-router-dom";
+/* import productsDatabase from "../database.json";
+ */
 export const Product = () => {
-  const params = useParams();
+  /* const params = useParams(); */
   /* const {productId} = useParams() */
 
-  /*+params.productId === Number(params.productId)*/
-  const product = productsDatabase.find((el) => el.id === +params.productId);
-
-  if (!product) {
+  /*Same Thing -> +params.productId === Number(params.productId)*/
+  /*const product = productsDatabase.find((el) => el.id === +params.productId);
+   */
+  /*   if (!product) {
     <h1>Oops... Invalid product</h1>;
-  }
+  } */
+
+  const product = useLoaderData();
 
   return (
     <section>

@@ -1,9 +1,9 @@
 npm i react-router-dom
 
+
 src-> Create file: router.jsx
 
 router.jsx:
-
 
 import {createBrowserRouter} from "react-router-dom"
 
@@ -27,6 +27,7 @@ const router = createBrowserRouter([
 ])
 
 
+
 App.jsx:
 
 import {RouterProvider} from "react-router-dom"
@@ -39,6 +40,7 @@ function App(){
 export default App
 
 
+
 Navbar.jsx:
 
 import React from "react";
@@ -47,7 +49,7 @@ import { Link } from "react-router-dom";
 export const Navbar = () => {
   return (
     <header>
-      <nav style={{ display: "flex", gap: "2rem" }}>
+      <nav style={{ display: "flex", gap: "2rem", justifyContent: "center" }}>
         <Link to="/">Home</Link>
         <Link to="/products">Products</Link>
         <Link to="/cart">Cart</Link>
@@ -55,6 +57,8 @@ export const Navbar = () => {
     </header>
   );
 };
+
+
 
 Home.jsx:
 
@@ -70,6 +74,8 @@ export const Home = () => {
   );
 };
 
+
+
 Products.jsx:
 
 import React from "react";
@@ -84,6 +90,8 @@ export const Products = () => {
   );
 };
 
+
+
 Cart.jsx:
 
 import React from "react";
@@ -97,6 +105,8 @@ export const Cart = () => {
     </div>
   );
 };
+
+
 
 Admin:
 
@@ -113,12 +123,15 @@ export const Admin = () => {
 };
 
 
+
 -------------------------------------------------------
+
 Best way to do this: with children
 
-1º: Remove <NavBar/> from all componentes
 
+1º: Remove <NavBar/> from all componentes
 2º: Pages -> create RootLayout.jsx:
+
 
 import React from "react";
 import { Navbar } from "../Components/Navbar";
@@ -135,6 +148,8 @@ export const RootLayout = () => {
     </>
   );
 };
+
+
 
 3º: router.jsx:
 
@@ -171,4 +186,244 @@ const router = createBrowserRouter([
 ]);
 
 export default router;
+
+
+
+------------------------------------------------
+
+dynamic routes
+
+
+1º src - create database.json:
+
+[
+  {
+    "id": 1,
+    "name": "intel 8700k",
+    "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    "price": "250"
+  },
+  {
+    "id": 2,
+    "name": "intel 8800k",
+    "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    "price": "350"
+  },
+  {
+    "id": 3,
+    "name": "ryzen 5x",
+    "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    "price": "320"
+  }
+]
+
+
+
+2º router.jsx:
+
+import { createBrowserRouter } from "react-router-dom";
+import { Home } from "./Pages/Home";
+import { Products } from "./Pages/Products";
+import { Cart } from "./Pages/Cart";
+import { Admin } from "./Pages/Admin";
+import { product } from "./Pages/Product";
+import { RootLayout } from "./Pages/RootLayout";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <RootLayout />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: "products",
+        element: <Products />,
+      },
+      {
+        path: "products/:productId",
+        element: <Product />,
+      },
+      {
+        path: "cart",
+        element: <Cart />,
+      },
+    ],
+  },
+  {
+    path: "/admin",
+    element: <Admin />,
+  },
+]);
+
+export default router;
+
+
+
+Product.jsx:
+
+import React from "react";
+import { Link, useParams } from "react-router-dom";
+import productsDatabase from "../database.json";
+
+export const Product = () => {
+  const params = useParams();
+  /* const {productId} = useParams() */
+
+  /*Same thing -> +params.productId === Number(params.productId)*/
+  const product = productsDatabase.find((el) => el.id === +params.productId);
+
+  if (!product) {
+    <h1>Oops... Invalid product</h1>;
+  }
+
+  return (
+    <section>
+      <Link to={"/products"}>
+        <button>Back to Products</button>
+      </Link>
+      <h3>{product.name}</h3>
+      <p>{product.description}</p>
+      <p>{product.price} €</p>
+      <button>Buy</button>
+    </section>
+  );
+};
+
+
+
+------------------------------------------------
+
+Error handling
+
+
+/src -> Create 2 folders - error-boundaries && loaders
+/loaders -> Create js file - products.js
+move our products.jsx logic for products.js
+
+
+products.js:
+
+import productsDatabase from "../database.json";
+
+export default function loadProduct({ params }) {
+    
+  const product = productsDatabase.find((el) => el.id === +params.productId);
+
+  return product;
+}
+
+
+
+router.jsx:
+
+Add -> loader: loadProduct
+
+import { createBrowserRouter, useParams } from "react-router-dom";
+import { Home } from "./Pages/Home";
+import { Products } from "./Pages/Products";
+import { Cart } from "./Pages/Cart";
+import { Admin } from "./Pages/Admin";
+import { RootLayout } from "./Pages/RootLayout";
+import { Product } from "./Pages/Product";
+import loadProduct from "./loaders/products";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <RootLayout />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: "products",
+        element: <Products />,
+      },
+      {
+        path: `products/:productId`,
+        element: <Product />,
+        loader: loadProduct
+      },
+      {
+        path: "cart",
+        element: <Cart />,
+      },
+    ],
+  },
+  {
+    path: "/admin",
+    element: <Admin />,
+  },
+]);
+
+export default router;
+
+
+
+products.jsx:
+to get our product, use Hook - useLoaderData()
+
+import React from "react";
+import { Link, useLoaderData } from "react-router-dom";
+
+export const Product = () => {
+
+  const product = useLoaderData();
+
+  return (
+    <section>
+      <Link to={"/products"}>
+        <button>Back to Products</button>
+      </Link>
+      <h3>{product.name}</h3>
+      <p>{product.description}</p>
+      <p>{product.price} €</p>
+      <button>Buy</button>
+    </section>
+  );
+};
+
+
+
+/error-boundaries -> Create component - ProductBoundary.jsx
+
+to get any error, use Hook - useRouteError()
+use react-router-dom auxiliary function to check router error (404, 500, etc) - isRouterErrorResponse()
+use a conditional (if or switch) and error.status to get specific error
+
+
+ProductBoundary.jsx:
+
+import React from "react";
+import { isRouteErrorResponse, useRouteError } from "react-router-dom";
+
+export const ProductBoundary = () => {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    switch (error.status) {
+      case 404:
+        return <h2>Oops... Product Not Found</h2>;
+      case 401:
+        return <h2>Unauthorized</h2>;
+      case 400:
+        return <h2>Something Wrong with request</h2>;
+      case 500:
+        return <h2>Internal Error</h2>;
+    }
+
+    return <h2>Something Wrong...</h2>;
+  }
+};
+
+
+
+------------------------------------------------
+
+
+
 
